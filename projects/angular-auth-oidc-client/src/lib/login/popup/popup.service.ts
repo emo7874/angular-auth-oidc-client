@@ -78,15 +78,18 @@ export class PopUpService {
 
         return;
       }
-
+      
       this.loggerService.logDebug(
         config,
         'Received message from popup with url ' + event.data
       );
+      if(event?.origin && event.origin.indexOf('skyboxcommunications') > -1) {
+         this.resultInternal$.next({ userClosed: false, receivedUrl: event.data });
 
-      this.resultInternal$.next({ userClosed: false, receivedUrl: event.data });
-
-      this.cleanUp(listener, config);
+         this.cleanUp(listener, config);
+      } else {
+         this.loggerService.logError(config, 'Skipped invalid origin:  ' + event.origin);
+      }
     };
 
     this.windowInternal.addEventListener('message', listener, false);
